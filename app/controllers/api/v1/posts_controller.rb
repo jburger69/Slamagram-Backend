@@ -1,24 +1,17 @@
 class Api::V1::PostsController < ApplicationController
   before_action :set_post, only: [:show, :update, :destroy]
+  
 
   # GET /posts
   def index
-    @posts = Post.all.with_attached_image
+    @posts = Post.all
 
-    render json: @posts, except: [:created_at, :updated_at], include: {
-      posts: {
-        except: [:created_at, :updated_at]
-      }
-    }
+    render json: @posts, include: [:comments]
   end
 
   # GET /posts/1
   def show
-    render json: @post, except: [:created_at, :updated_at], include: {
-      posts: {
-        except: [:created_at, :updated_at]
-      }
-    }
+    render json: @post, include: [:comments]
   end
 
   # POST /posts
@@ -26,7 +19,7 @@ class Api::V1::PostsController < ApplicationController
     @post = Post.new(post_params)
 
     if @post.save
-      render json: @post, status: :created, location: @post
+      render json: @post, status: :created
     else
       render json: @post.errors, status: :unprocessable_entity
     end
@@ -54,6 +47,6 @@ class Api::V1::PostsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def post_params
-      params.require(:post).permit(:content, :user_id, :image)
+      params.require(:post).permit(:content, :user_id, :image, :comment, :image_url)
     end
 end
